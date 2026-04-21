@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Evenimente — Manufaktura Flowers Constanța</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.ev-hero{position:relative;height:80vh;min-height:560px;overflow:hidden;display:flex;align-items:flex-end;}
+.ev-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.ev-hero-ov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(18,14,12,.3) 0%,rgba(18,14,12,.85) 100%);}
+.ev-hero-text{position:relative;z-index:2;padding:4rem 5vw;color:#fff;}
+.ev-hero-text .tag{color:var(--rose2);}
+.ev-hero-text h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,6vw,6rem);font-weight:300;line-height:1.05;margin-bottom:1rem;}
+.ev-hero-text h1 em{font-style:italic;color:var(--rose2);}
+.ev-hero-text p{font-size:.95rem;color:rgba(255,255,255,.65);max-width:540px;line-height:1.75;}
+
+/* EVENT TYPES */
+.ev-types{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--cream3);}
+.ev-type-card{background:var(--cream);padding:2.5rem 2rem;text-align:center;cursor:pointer;transition:background .3s,transform .3s;text-decoration:none;display:block;}
+.ev-type-card:hover{background:var(--rose);transform:translateY(-4px);}
+.ev-type-card:hover h3,.ev-type-card:hover p{color:#fff;}
+.ev-type-ico{font-size:2.5rem;margin-bottom:1rem;display:block;}
+.ev-type-card h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;margin-bottom:.4rem;transition:color .3s;}
+.ev-type-card p{font-size:.75rem;color:var(--muted);letter-spacing:.06em;transition:color .3s;}
+
+/* PROJECTS GRID */
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+.proj-card{position:relative;overflow:hidden;cursor:pointer;}
+.proj-card img{width:100%;aspect-ratio:4/5;object-fit:cover;transition:transform .8s cubic-bezier(.25,.46,.45,.94),filter .4s;}
+.proj-card:hover img{transform:scale(1.08);filter:brightness(1.05);}
+.proj-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(18,14,12,.9) 0%,transparent 55%);}
+.proj-body{position:absolute;bottom:0;left:0;right:0;padding:2rem 1.8rem;transform:translateY(8px);transition:transform .35s;}
+.proj-card:hover .proj-body{transform:none;}
+.proj-type-tag{font-size:.54rem;letter-spacing:.26em;text-transform:uppercase;color:var(--rose2);margin-bottom:.5rem;}
+.proj-body h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:#fff;margin-bottom:.4rem;}
+.proj-body p{font-size:.78rem;color:rgba(255,255,255,.6);}
+
+/* SLIDESHOW */
+.slideshow{position:relative;height:65vh;overflow:hidden;}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;}
+.slide.active{opacity:1;}
+.slide img{width:100%;height:100%;object-fit:cover;}
+.slide-overlay{position:absolute;inset:0;background:rgba(18,14,12,.35);}
+.slide-nav{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;gap:.6rem;z-index:2;}
+.slide-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.4);transition:background .3s;cursor:pointer;}
+.slide-dot.active{background:#fff;}
+.slide-arrows{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:100%;display:flex;justify-content:space-between;padding:0 2rem;}
+.slide-arrow{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;backdrop-filter:blur(8px);transition:background .2s;}
+.slide-arrow:hover{background:rgba(255,255,255,.3);}
+.slide-caption{position:absolute;bottom:5rem;left:5vw;z-index:2;color:#fff;}
+.slide-caption h3{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;}
+.slide-caption p{font-size:.78rem;color:rgba(255,255,255,.65);margin-top:.3rem;}
+
+/* PROCESS */
+.process-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--cream3);}
+.proc-step{padding:3rem 2.5rem;border-right:1px solid var(--cream3);}
+.proc-step:last-child{border-right:none;}
+.proc-num{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:300;color:var(--rose3);line-height:1;margin-bottom:1rem;}
+.proc-step h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;margin-bottom:.8rem;}
+.proc-step p{font-size:.85rem;line-height:1.75;color:var(--muted);}
+
+/* CONTACT CTA */
+.ev-cta{background:var(--dark2);padding:7rem 5vw;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.ev-cta h2{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3.5vw,3.2rem);font-weight:300;color:#fff;line-height:1.15;}
+.ev-cta h2 em{font-style:italic;color:var(--rose2);}
+.ev-cta p{font-size:.88rem;color:rgba(255,255,255,.55);line-height:1.8;margin-top:1rem;}
+.ev-contact-form{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);padding:2.5rem;}
+.ev-contact-form h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:#fff;margin-bottom:1.5rem;}
+.ev-contact-form .form-group input,.ev-contact-form .form-group select,.ev-contact-form .form-group textarea{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;}
+.ev-contact-form .form-group input::placeholder,.ev-contact-form .form-group textarea::placeholder{color:rgba(255,255,255,.3);}
+.ev-contact-form .form-group input:focus,.ev-contact-form .form-group select:focus,.ev-contact-form .form-group textarea:focus{border-color:var(--rose);}
+.ev-contact-form .form-group label{color:rgba(255,255,255,.5);}
+.ev-contact-form select option{background:var(--dark2);color:#fff;}
+
+@media(max-width:900px){
+  .ev-types{grid-template-columns:repeat(2,1fr);}
+  .projects-grid{grid-template-columns:repeat(2,1fr);}
+  .process-grid{grid-template-columns:1fr;}
+  .proc-step{border-right:none;border-bottom:1px solid var(--cream3);}
+  .ev-cta{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .projects-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="nav"></div>
+
+<!-- HERO -->
+<div class="ev-hero">
+  <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1800&q=90" alt="Evenimente Manufaktura" loading="eager">
+  <div class="ev-hero-ov"></div>
+  <div class="ev-hero-text">
+    <div class="tag">Evenimente Speciale</div>
+    <h1>Nunți. Botezuri.<br><em>Momente de neuitat.</em></h1>
+    <p>De la ceremonia pe plajă până la sala de gală — Manufaktura Flowers transformă fiecare eveniment într-o poveste florală unică.</p>
+  </div>
+</div>
+
+<!-- EVENT TYPES -->
+<div class="ev-types">
+  <a href="#nunti" class="ev-type-card"><span class="ev-type-ico">💒</span><h3>Nunți</h3><p>Buchete & Decorațiuni Complete</p></a>
+  <a href="#botezuri" class="ev-type-card"><span class="ev-type-ico">👶</span><h3>Botezuri</h3><p>Aranjamente Delicate</p></a>
+  <a href="#corporate" class="ev-type-card"><span class="ev-type-ico">🏢</span><h3>Corporate</h3><p>Evenimente de Business</p></a>
+  <a href="#private" class="ev-type-card"><span class="ev-type-ico">🥂</span><h3>Private Events</h3><p>Cine & Petreceri Private</p></a>
+</div>
+
+<!-- SLIDESHOW - fotografiile tale reale -->
+<div class="slideshow" id="mainSlideshow">
+  <div class="slide active">
+    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&q=85" alt="Nuntă plajă" loading="lazy">
+    <div class="slide-overlay"></div>
+    <div class="slide-caption"><h3>Nuntă pe Plajă · Constanța</h3><p>Hortensia albastră, pampas și trandafiri albi</p></div>
+  </div>
+  <div class="slide">
+    <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1600&q=85" alt="Masă eveniment" loading="lazy">
+    <div class="slide-overlay"></div>
+    <div class="slide-caption"><h3>Masă de Gală · Restaurant Privat</h3><p>Dalii, eucalipt și aranjamente personalizate</p></div>
+  </div>
+  <div class="slide">
+    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1600&q=85" alt="Decoratiuni" loading="lazy">
+    <div class="slide-overlay"></div>
+    <div class="slide-caption"><h3>Eveniment Privat · Constanța</h3><p>Aranjamente de masă cu dahlia și trandafiri garden</p></div>
+  </div>
+  <div class="slide">
+    <img src="https://images.unsplash.com/photo-1478146059778-26028b07395a?w=1600&q=85" alt="Aranjament" loading="lazy">
+    <div class="slide-overlay"></div>
+    <div class="slide-caption"><h3>Cină Romantică · Mamaia</h3><p>Luminița mării și dalii roz</p></div>
+  </div>
+  <div class="slide-nav" id="slideDots"></div>
+  <div class="slide-arrows">
+    <button class="slide-arrow" onclick="prevSlide()">‹</button>
+    <button class="slide-arrow" onclick="nextSlide()">›</button>
+  </div>
+</div>
+
+<!-- PROJECTS - NUNTI -->
+<section class="sec" id="nunti">
+  <div class="tag">Nunți</div>
+  <h2 class="sec-title" style="margin-bottom:2.5rem;">Povestea voastră,<br><em>spusă prin flori.</em></h2>
+  <div class="projects-grid">
+    <div class="proj-card reveal">
+      <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=700&q=85" alt="Nunta plaja" loading="lazy">
+      <div class="proj-overlay"></div>
+      <div class="proj-body"><div class="proj-type-tag">Nuntă · Plajă</div><h3>Buchet Albastru Marin</h3><p>Hortensia, pampas & trandafiri albi</p></div>
+    </div>
+    <div class="proj-card reveal" data-delay="100">
+      <img src="https://images.unsplash.com/photo-1550005809-91ad75fb315f?w=700&q=85" alt="Buchet mireasa" loading="lazy">
+      <div class="proj-overlay"></div>
+      <div class="proj-body"><div class="proj-type-tag">Nuntă · Clasic</div><h3>Mireasă Ivory</h3><p>Bujori, trandafiri & eucalipt</p></div>
+    </div>
+    <div class="proj-card reveal" data-delay="200">
+      <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=700&q=85" alt="Masa nunta" loading="lazy">
+      <div class="proj-overlay"></div>
+      <div class="proj-body"><div class="proj-type-tag">Nuntă · Decorațiuni</div><h3>Masa de Gală</h3><p>Aranjamente complete sal nuntă</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS - EVENIMENTE PRIVATE -->
+<section class="sec sec-cream" id="private">
+  <div class="tag">Evenimente Private</div>
+  <h2 class="sec-title" style="margin-bottom:2.5rem;">Cine private &<br><em>momente speciale.</em></h2>
+  <div class="projects-grid">
+    <div class="proj-card reveal">
+      <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&q=85" alt="Cina privata" loading="lazy">
+      <div class="proj-overlay"></div>
+      <div class="proj-body"><div class="proj-type-tag">Cină Privată</div><h3>Seară în Aer Liber</h3><p>Dahlia, trandafiri garden & lumini calde</p></div>
+    </div>
+    <div class="proj-card reveal" data-delay="100">
+      <img src="https://images.unsplash.com/photo-1478146059778-26028b07395a?w=700&q=85" alt="Aranjament eveniment" loading="lazy">
+      <div class="proj-overlay"></div>
+      <div class="proj-body"><div class="proj-type-tag">Aniversare</div><h3>Aranjament Central</h3><p>Dalii, ranunculus & verdeață</p></div>
+    </div>
+    <div class="proj-card reveal" data-delay="200">
+      <img src="https://images.unsplash.com/photo-1487530811015-780c4fbc6fbb?w=700&q=85" alt="Botez" loading="lazy">
+      <div class="proj-overlay"></div>
+      <div class="proj-body"><div class="proj-type-tag">Botez</div><h3>Aranjamente Delicate</h3><p>Roz pudrat & alb pur</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="sec">
+  <div class="tag">Cum Lucrăm</div>
+  <h2 class="sec-title" style="margin-bottom:3rem;">Procesul nostru<br>pentru <em>evenimentul tău.</em></h2>
+  <div class="process-grid">
+    <div class="proc-step reveal"><div class="proc-num">01</div><h3>Consultație Gratuită</h3><p>Ne contactezi telefonic sau prin formular. Discutăm viziunea ta, bugetul și data evenimentului. Nu există întrebări greșite — suntem alături de tine.</p></div>
+    <div class="proc-step reveal" data-delay="150"><div class="proc-num">02</div><h3>Propunere Florală</h3><p>Creăm o propunere personalizată cu mostre, paletă de culori și estimare de cost. Modificăm până când totul este perfect pentru tine.</p></div>
+    <div class="proc-step reveal" data-delay="300"><div class="proc-num">03</div><h3>Ziua Perfectă</h3><p>Echipa noastră ajunge la locație cu timp, instalează decorațiunile cu grijă și rămâne disponibilă pe tot parcursul evenimentului.</p></div>
+  </div>
+</section>
+
+<!-- CONTACT CTA -->
+<div class="ev-cta">
+  <div class="reveal-left">
+    <div class="tag" style="color:var(--rose2);">Organizezi un Eveniment?</div>
+    <h2>Hai să creăm ceva<br><em>de neuitat</em> împreună.</h2>
+    <p>Trimite-ne detaliile evenimentului tău și te contactăm în cel mult 24 de ore cu o propunere personalizată.</p>
+    <div style="margin-top:2rem;display:flex;flex-direction:column;gap:.8rem;">
+      <div style="display:flex;align-items:center;gap:1rem;font-size:.85rem;color:rgba(255,255,255,.6);">
+        <span style="color:var(--rose2);">📞</span> <a href="tel:+40733804144" style="color:rgba(255,255,255,.8);text-decoration:none;">0733 804 144</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;font-size:.85rem;color:rgba(255,255,255,.6);">
+        <span style="color:var(--rose2);">✉️</span> <a href="mailto:manufakturaflowers@gmail.com" style="color:rgba(255,255,255,.8);text-decoration:none;">manufakturaflowers@gmail.com</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;font-size:.85rem;color:rgba(255,255,255,.6);">
+        <span style="color:var(--rose2);">📷</span> <a href="https://www.instagram.com/manufakturaflowers" target="_blank" style="color:rgba(255,255,255,.8);text-decoration:none;">@manufakturaflowers</a>
+      </div>
+    </div>
+  </div>
+  <div class="reveal-right">
+    <div class="ev-contact-form">
+      <h3>Solicită o Ofertă</h3>
+      <div class="form-group"><label>Nume & Prenume</label><input type="text" id="evName" placeholder="Numele tău"></div>
+      <div class="form-group"><label>Telefon</label><input type="tel" id="evPhone" placeholder="07xx xxx xxx"></div>
+      <div class="form-group"><label>Tip Eveniment</label>
+        <select id="evType">
+          <option>Nuntă</option><option>Botez</option><option>Aniversare</option>
+          <option>Eveniment Corporate</option><option>Altul</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Data Evenimentului</label><input type="date" id="evDate"></div>
+      <div class="form-group"><label>Număr de Invitați</label><input type="number" id="evGuests" placeholder="ex: 100"></div>
+      <div class="form-group"><label>Detalii suplimentare</label><textarea id="evMsg" rows="3" placeholder="Descrie viziunea ta florală…"></textarea></div>
+      <button class="btn-rose" style="width:100%;" onclick="sendEventRequest()"><span>Trimite Solicitarea →</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="footer"></div>
+<div class="toast"></div>
+<script src="app.js"></script>
+<script>
+renderNav('events');
+renderCartSidebar();
+renderFooter();
+setupReveal();
+setupCursor();
+
+// Slideshow
+let slideIdx = 0;
+const slides = document.querySelectorAll('.slide');
+const dotsEl = document.getElementById('slideDots');
+slides.forEach((_,i) => dotsEl.innerHTML += `<div class="slide-dot ${i===0?'active':''}" onclick="goSlide(${i})"></div>`);
+function goSlide(n){
+  slides[slideIdx].classList.remove('active');
+  document.querySelectorAll('.slide-dot')[slideIdx].classList.remove('active');
+  slideIdx = (n+slides.length)%slides.length;
+  slides[slideIdx].classList.add('active');
+  document.querySelectorAll('.slide-dot')[slideIdx].classList.add('active');
+}
+function nextSlide(){goSlide(slideIdx+1);}
+function prevSlide(){goSlide(slideIdx-1);}
+setInterval(nextSlide, 5000);
+
+function sendEventRequest(){
+  const name=document.getElementById('evName').value;
+  const phone=document.getElementById('evPhone').value;
+  if(!name||!phone){showToast('Completează numele și telefonul.','error');return;}
+  showToast('🌸 Solicitare trimisă! Te contactăm în 24h.','success');
+  ['evName','evPhone','evGuests','evMsg'].forEach(id=>document.getElementById(id).value='');
+}
+</script>
+</body>
+</html>

@@ -350,7 +350,7 @@ async function placeOrder(){
   }
 
   // Save order for confirmation page
-  localStorage.setItem('mf_last_order', JSON.stringify(orderData));
+  localStorage.setItem('mf3_last_order', JSON.stringify(orderData));
   cart=[];saveCart();
   window.location.href='confirmation.html';
 }

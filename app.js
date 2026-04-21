@@ -1,197 +1,57 @@
-// ══ SUPABASE CONFIG ══
 const SUPABASE_URL = 'https://mqidgmicrinvytqwodie.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xaWRnbWljcmludnl0cXdvZGllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODA4NjMsImV4cCI6MjA5MjM1Njg2M30.8-3geqfxS4LEP8S25PDTt1KljfCHpn9dhiaOBo2_zEk';
+let supabase = null;
 async function initSupabase(){
-  if(SUPABASE_URL.includes('PUNE')) return null;
-  try{
-    const {createClient} = await import('https://esm.sh/@supabase/supabase-js@2');
-    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-    return supabase;
-  }catch(e){return null;}
+  try{const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2');supabase=createClient(SUPABASE_URL,SUPABASE_KEY);return supabase;}
+  catch(e){return null;}
 }
 
-// ══ PRODUSE ══
 const PRODUCTS = [
-  {id:'trandafiri-rosii-pene',name:'Trandafiri Roșii & Pene de Păun',category:'Romantic',price:180,oldPrice:null,img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=85',img2:'https://images.unsplash.com/photo-1490750967868-88df5691cc9e?w=700&q=85',desc:'Un buchet dramatic de trandafiri roșii petalaţi, îmbogățit cu pene de păun aurii și ramuri de eucalipt. O declarație de dragoste elegantă.',tags:['Romantic','Cadou','Aniversare'],available:true},
-  {id:'buchet-primavara-roz',name:'Primăvara în Roz',category:'Sezonier',price:140,oldPrice:160,img:'https://images.unsplash.com/photo-1490750967868-88df5691cc9e?w=700&q=85',img2:'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=700&q=85',desc:'Lalele roz pudrate, ghiocei și ramuri în floare — prospețimea primăverii într-un singur gest.',tags:['Sezonier','Primăvară','Proaspăt'],available:true},
-  {id:'buchet-nunta-boho',name:'Buchet Nuntă Boho',category:'Nuntă',price:350,oldPrice:null,img:'https://images.unsplash.com/photo-1519378058457-4c29a0a2efac?w=700&q=85',img2:'https://images.unsplash.com/photo-1487530811015-780c4fbc6fbb?w=700&q=85',desc:'Hortensia roz, trandafiri ivory, pampas și iarbă decorativă. Buchetul perfect pentru mireasa modernă cu suflet boem.',tags:['Nuntă','Boho','Mireasa'],available:true},
-  {id:'aranjament-pastel',name:'Aranjament Pastel Spring',category:'Aranjament',price:220,oldPrice:null,img:'https://images.unsplash.com/photo-1487530811015-780c4fbc6fbb?w=700&q=85',img2:'https://images.unsplash.com/photo-1490750967868-88df5691cc9e?w=700&q=85',desc:'Trandafiri garden, bujori, lisiante și verdeață luxuriantă într-un aranjament pentru birou sau eveniment.',tags:['Aranjament','Pastel','Birou'],available:true},
-  {id:'little-princess',name:'Little Princess Box',category:'Cadou',price:160,oldPrice:180,img:'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=700&q=85',img2:'https://images.unsplash.com/photo-1490750967868-88df5691cc9e?w=700&q=85',desc:'Cutie albastră cu garoafe roz, antirrhinum și decoraţiuni personalizate. Cadoul perfect pentru fetiţa ta.',tags:['Cadou','Copii','Roz'],available:true},
-  {id:'rainbow-box',name:'Rainbow Box',category:'Aranjament',price:280,oldPrice:null,img:'https://images.unsplash.com/photo-1487530811015-780c4fbc6fbb?w=700&q=85',img2:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=85',desc:'Hortensia albă, trandafiri mov și roz, anthurium și iarbă roz vibrantă. O explozie de culoare și textură.',tags:['Colorat','Aranjament','Special'],available:true},
-  {id:'aranjament-rosu-dramatic',name:'Eleganță în Roșu',category:'Romantic',price:320,oldPrice:null,img:'https://images.unsplash.com/photo-1490750967868-88df5691cc9e?w=700&q=85',img2:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=85',desc:'Aranjament dramatic cu anthurium roșu, trandafiri și elemente ornamentale în cupă aurie. Opulență pură.',tags:['Romantic','Dramatic','Lux'],available:true},
-  {id:'trandafiri-rosii-clasici',name:'Trandafiri Roșii Clasici',category:'Romantic',price:150,oldPrice:null,img:'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=700&q=85',img2:'https://images.unsplash.com/photo-1487530811015-780c4fbc6fbb?w=700&q=85',desc:'21 de trandafiri roșii mari, ținuți în mâini — cel mai clasic și iubit gest de dragoste.',tags:['Clasic','Romantic','Dragoste'],available:true},
-  {id:'aranjament-paste',name:'Aranjament Paște',category:'Sezonier',price:190,oldPrice:210,img:'https://images.unsplash.com/photo-1487530811015-780c4fbc6fbb?w=700&q=85',img2:'https://images.unsplash.com/photo-1490750967868-88df5691cc9e?w=700&q=85',desc:'Lalele galbene și roz, gerbere și ramuri de salcie — un aranjament plin de prospețimea primăverii.',tags:['Sezonier','Paște','Primăvară'],available:true},
+  {id:'eden-rose',name:'Eden Rose',en:'Garden Rose Heaven',cat:'Romantic',price:220,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Trandafiri garden ecuadorieni în nuanțe de roșu și roz intens, cu frunze de eucalipt și accent de pene delicate.',tags:['Trandafiri','Ecuadorian','Lux'],featured:true},
+  {id:'peony-dream',name:'Peony Dream',en:'Peony Bliss',cat:'Romantic',price:185,old:210,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Bujori roz pudrat și ivory cu ranunculus alb și verdeață delicată.',tags:['Bujori','Pastel','Elegant'],featured:true},
+  {id:'velvet-wine',name:'Velvet Wine',en:'Deep Romance',cat:'Romantic',price:240,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Trandafiri burgundy, anemone negre și smilax.',tags:['Burgundy','Dark','Premium'],featured:false},
+  {id:'sunrise-joy',name:'Sunrise Joy',en:'Morning Bloom',cat:'Romantic',price:155,old:180,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Lalele portocalii, frezie galbenă și ranunculus roz.',tags:['Lalele','Viu','Bucurie'],featured:false},
+  {id:'bridal-blue',name:'Bridal Blue',en:'Something Blue',cat:'Nuntă',price:480,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Hortensia albastră celest, pampas auriu, trandafiri albi.',tags:['Albastru','Nuntă','Iconic'],featured:true},
+  {id:'ivory-grace',name:'Ivory Grace',en:'Pure Elegance',cat:'Nuntă',price:420,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Bujori ivory, trandafiri garden, lisiante albe și eucalipt.',tags:['Ivory','Mireasă','Pur'],featured:true},
+  {id:'boho-soul',name:'Boho Soul',en:'Wild & Free',cat:'Nuntă',price:380,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Pampas, dalii garden, trandafiri roz și verdeață sălbatică.',tags:['Boho','Natural','Liber'],featured:false},
+  {id:'luxury-box',name:'Luxury Gift Box',en:'The Premium Gift',cat:'Cadou',price:350,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Cutie premium cu trandafiri ecuadorieni, bujori și ciocolată artizanală.',tags:['Cutie','Premium','Cadou'],featured:true},
+  {id:'pink-joy',name:'Pink Joy Box',en:'Blush & Pink',cat:'Cadou',price:195,old:230,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Cutie roz cu trandafiri garden, bujori și decorații personalizate.',tags:['Roz','Cutie','Feminin'],featured:false},
+  {id:'thank-you',name:'Thank You',en:'Gratitude Bouquet',cat:'Cadou',price:135,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Buchet mic și sincer pentru a mulțumi.',tags:['Mulțumire','Mic','Sincer'],featured:false},
+  {id:'event-table',name:'Table Arrangement',en:'Event Centerpiece',cat:'Aranjament',price:300,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Dalii, trandafiri garden și verdeață luxuriantă în vas ceramic modern.',tags:['Masă','Eveniment','Modern'],featured:true},
+  {id:'gala-center',name:'Gala Centerpiece',en:'Grand Event',cat:'Aranjament',price:450,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Aranjament de gală cu hortensia, eucalipt și bujori în vase aurii.',tags:['Gală','Lux','Eveniment'],featured:false},
+  {id:'desk-bloom',name:'Desk Bloom',en:'Office Elegance',cat:'Aranjament',price:165,old:190,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Aranjament elegant pentru birou — trandafiri, eucalipt.',tags:['Birou','Elegant','Compact'],featured:false},
+  {id:'summer-sea',name:'Summer at Sea',en:'Coastal Summer',cat:'Sezonier',price:165,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Hortensia albastră, dalii albe și iarbă decorativă.',tags:['Vară','Albastru','Marin'],featured:true},
+  {id:'autumn-poetry',name:'Autumn Poetry',en:'Fall Romance',cat:'Sezonier',price:175,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Dalii portocalii și burgundy, eucalipt și cotinus.',tags:['Toamnă','Dalii','Cald'],featured:false},
+  {id:'winter-white',name:'Winter White',en:'Snowy Elegance',cat:'Sezonier',price:170,old:195,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Trandafiri albi, bumbac decorativ și eucalipt argintiu.',tags:['Iarnă','Alb','Elegant'],featured:false},
+  {id:'spring-revival',name:'Spring Revival',en:'First Bloom',cat:'Sezonier',price:145,old:165,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Lalele, narcise și ramuri în floare.',tags:['Primăvară','Lalele','Proaspăt'],featured:false},
+  {id:'eternal-red',name:'Eternal Red',en:'Classic Romance',cat:'Romantic',price:195,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'21 trandafiri roșii mari — gestul clasic al iubirii.',tags:['Clasic','Trandafiri','Dragoste'],featured:false},
+  {id:'orchid-luxe',name:'Orchid Luxe',en:'Orchid Prestige',cat:'Cadou',price:280,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Orhidee Phalaenopsis în ghiveci decorativ premium.',tags:['Orhidee','Premium','Durabil'],featured:false},
+  {id:'meadow-fresh',name:'Meadow Fresh',en:'Wildflower Bouquet',cat:'Romantic',price:140,old:null,img:'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=700&q=90',desc:'Flori de câmp, frezie, centauree și verdeață naturală.',tags:['Natural','Câmp','Proaspăt'],featured:false},
 ];
 
-// ══ CART ══
-let cart = JSON.parse(localStorage.getItem('mf_cart')||'[]');
-function saveCart(){localStorage.setItem('mf_cart',JSON.stringify(cart));}
+let cart=JSON.parse(localStorage.getItem('mf3_cart')||'[]');
+function saveCart(){localStorage.setItem('mf3_cart',JSON.stringify(cart));}
+function getCartTotal(){return cart.reduce((s,i)=>s+i.price*i.qty,0);}
 function getCartCount(){return cart.reduce((s,i)=>s+i.qty,0);}
-function getCartTotal(){return cart.reduce((s,i)=>s+(i.price*i.qty),0);}
 function addToCart(id,qty=1){
-  const p = PRODUCTS.find(p=>p.id===id);
-  if(!p) return;
-  const existing = cart.find(i=>i.id===id);
-  if(existing) existing.qty+=qty;
-  else cart.push({id,name:p.name,price:p.price,img:p.img,qty});
-  saveCart(); updateCartUI();
-  showToast('🌸 '+p.name+' adăugat în coș!','success');
+  const p=PRODUCTS.find(x=>x.id===id);if(!p) return;
+  const ex=cart.find(i=>i.id===id);
+  if(ex) ex.qty+=qty;else cart.push({id,name:p.name,price:p.price,img:p.img,qty});
+  saveCart();updateCartUI();
+  showToast('🌸 '+p.name+' adăugat!','success');
 }
-function removeFromCart(id){cart=cart.filter(i=>i.id!==id);saveCart();updateCartUI();renderCartItems();}
-function updateQty(id,delta){
-  const item=cart.find(i=>i.id===id);
-  if(!item) return;
-  item.qty+=delta;
-  if(item.qty<=0) removeFromCart(id);
-  else{saveCart();updateCartUI();renderCartItems();}
-}
-function updateCartUI(){
-  document.querySelectorAll('.cart-count').forEach(el=>el.textContent=getCartCount());
-  document.querySelectorAll('.cart-total-val').forEach(el=>el.textContent=getCartTotal()+' lei');
-}
+function removeFromCart(id){cart=cart.filter(i=>i.id!==id);saveCart();updateCartUI();if(typeof renderCartItems==='function')renderCartItems();}
+function updateQty(id,d){const it=cart.find(i=>i.id===id);if(!it)return;it.qty+=d;if(it.qty<=0)removeFromCart(id);else{saveCart();updateCartUI();if(typeof renderCartItems==='function')renderCartItems();}}
+function updateCartUI(){document.querySelectorAll('.cart-count,.cart-badge,.cb').forEach(el=>{const n=getCartCount();el.textContent=n||'';});document.querySelectorAll('.cart-total-val,.ctv').forEach(el=>el.textContent=getCartTotal().toLocaleString()+' lei');}
 function renderCartItems(){
-  const el=document.getElementById('cartItems');
-  if(!el) return;
-  if(!cart.length){el.innerHTML='<div class="cart-empty"><p>Coșul tău e gol</p><span>Adaugă buchete frumoase 🌸</span></div>';return;}
-  el.innerHTML=cart.map(i=>`
-  <div class="cart-item">
-    <img class="cart-item-img" src="${i.img}" alt="${i.name}">
-    <div class="cart-item-info">
-      <div class="cart-item-name">${i.name}</div>
-      <div class="cart-item-price">${i.price} lei / buc</div>
-      <div class="cart-item-qty">
-        <button class="qty-btn" onclick="updateQty('${i.id}',-1)">−</button>
-        <span class="qty-val">${i.qty}</span>
-        <button class="qty-btn" onclick="updateQty('${i.id}',1)">+</button>
-        <button class="cart-remove" onclick="removeFromCart('${i.id}')">✕ Șterge</button>
-      </div>
-    </div>
-  </div>`).join('');
+  const el=document.getElementById('cartItems');if(!el)return;
+  if(!cart.length){el.innerHTML='<div style="text-align:center;padding:3rem;color:#999"><div style="font-size:3rem;opacity:.3">🌸</div><p>Coșul tău e gol</p></div>';return;}
+  el.innerHTML=cart.map(i=>`<div style="display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid #f0e8dc"><img src="${i.img}" style="width:70px;height:70px;object-fit:cover;flex-shrink:0"><div style="flex:1"><div style="font-family:'Cormorant Garamond',serif;font-size:1.05rem">${i.name}</div><div style="font-size:.82rem;color:#b8637a">${i.price} lei</div><div style="display:flex;align-items:center;gap:.5rem;margin-top:.4rem"><button onclick="updateQty('${i.id}',-1)" style="width:26px;height:26px;border:1px solid #ddd;background:#fff;cursor:pointer">−</button><span>${i.qty}</span><button onclick="updateQty('${i.id}',1)" style="width:26px;height:26px;border:1px solid #ddd;background:#fff;cursor:pointer">+</button><button onclick="removeFromCart('${i.id}')" style="margin-left:auto;background:none;border:none;color:#999;font-size:.7rem;cursor:pointer">✕</button></div></div></div>`).join('');
 }
-function openCart(){
-  document.getElementById('cartSidebar').classList.add('open');
-  document.getElementById('cartOverlay').classList.add('open');
-  renderCartItems(); updateCartUI();
-}
-function closeCart(){
-  document.getElementById('cartSidebar').classList.remove('open');
-  document.getElementById('cartOverlay').classList.remove('open');
-}
-
-// ══ TOAST ══
-function showToast(msg,type='info'){
-  let t=document.querySelector('.toast');
-  if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t);}
-  t.textContent=msg; t.className=`toast ${type} show`;
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
-
-// ══ REVEAL ══
-function setupReveal(){
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(!e.isIntersecting) return;
-      const el=e.target;
-      setTimeout(()=>el.classList.add('visible'),parseInt(el.dataset.delay||0));
-      obs.unobserve(el);
-    });
-  },{threshold:.1});
-  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
-}
-
-// ══ NAV ══
-function setupNav(){
-  const nav=document.querySelector('.nav');
-  if(!nav) return;
-  const update=()=>nav.classList.toggle('solid',window.scrollY>60);
-  window.addEventListener('scroll',update,{passive:true});
-  update();
-}
-
-// ══ NAV HTML ══
-function renderNav(active=''){
-  const el=document.getElementById('nav');
-  if(!el) return;
-  el.innerHTML=`
-  <nav class="nav" id="navBar">
-    <a class="nav-brand" href="index.html">Manufaktura Flowers<small>Florărie · Constanța</small></a>
-    <div class="nav-links">
-      <a href="shop.html" class="${active==='shop'?'active':''}">Magazin</a>
-      <a href="index.html#despre">Despre Noi</a>
-      <a href="index.html#contact">Contact</a>
-      <a href="orders.html">Comenzile Mele</a>
-    </div>
-    <div class="nav-right">
-      <button class="cart-btn" onclick="openCart()">🛒<span class="cart-count">0</span></button>
-      <a href="shop.html" class="nav-cta">Comandă Acum</a>
-    </div>
-  </nav>`;
-  setupNav();
-  updateCartUI();
-}
-
-// ══ CART SIDEBAR HTML ══
-function renderCartSidebar(){
-  const existing=document.getElementById('cartSidebar');
-  if(existing) return;
-  document.body.insertAdjacentHTML('beforeend',`
-  <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
-  <div class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header">
-      <h3>Coșul Meu 🛒</h3>
-      <button class="cart-close" onclick="closeCart()">✕</button>
-    </div>
-    <div class="cart-items" id="cartItems"></div>
-    <div class="cart-footer">
-      <div class="cart-total">
-        <span>Total</span>
-        <strong class="cart-total-val">0 lei</strong>
-      </div>
-      <a href="checkout.html" class="btn-rose" style="width:100%;" onclick="closeCart()">Finalizează Comanda →</a>
-    </div>
-  </div>`);
-}
-
-// ══ FOOTER HTML ══
-function renderFooter(){
-  const el=document.getElementById('footer');
-  if(!el) return;
-  el.innerHTML=`
-  <footer>
-    <div class="foot-grid">
-      <div>
-        <a href="index.html" class="foot-brand">Manufaktura Flowers</a>
-        <div class="foot-tagline">Florărie online · Constanța</div>
-        <div style="margin-top:1.5rem;">
-          <p style="color:rgba(255,255,255,.55);font-size:.82rem;line-height:1.7;">Str. Eliberarii, nr. 48<br>Constanța, România<br><a href="tel:+40733804144" style="color:var(--rose2);">0733 804 144</a><br><a href="mailto:manufakturaflowers@gmail.com" style="color:var(--rose2);">manufakturaflowers@gmail.com</a></p>
-        </div>
-      </div>
-      <div class="foot-col"><h5>Magazin</h5>
-        <a href="shop.html">Toate Buchetele</a>
-        <a href="shop.html?cat=Romantic">Romantic</a>
-        <a href="shop.html?cat=Nuntă">Nuntă</a>
-        <a href="shop.html?cat=Cadou">Cadouri</a>
-        <a href="shop.html?cat=Sezonier">Sezonier</a>
-      </div>
-      <div class="foot-col"><h5>Informații</h5>
-        <a href="index.html#despre">Despre Noi</a>
-        <a href="orders.html">Comenzile Mele</a>
-        <a href="index.html#contact">Contact</a>
-        <p>Program: Luni–Sâmbătă<br>09:00 – 20:00</p>
-      </div>
-      <div class="foot-col"><h5>Livrare</h5>
-        <p>Constanța, Ovidiu,<br>Năvodari, Valu lui Traian</p>
-        <p style="margin-top:.8rem;">Livrare rapidă în<br>2–4 ore</p>
-        <a href="shop.html" style="margin-top:.8rem;">Comandă Acum →</a>
-      </div>
-    </div>
-    <div class="foot-bottom">
-      <p>© 2025 Manufaktura Flowers · Constanța · Toate drepturile rezervate</p>
-      <div class="foot-social">
-        <a href="https://www.instagram.com/manufakturaflowers" target="_blank">📷</a>
-        <a href="tel:+40733804144">📞</a>
-        <a href="mailto:manufakturaflowers@gmail.com">✉️</a>
-      </div>
-    </div>
-  </footer>`;
-}
+function openCart(){const sb=document.getElementById('cartSidebar')||document.getElementById('cartSb');const ov=document.getElementById('cartOverlay')||document.getElementById('cartOv');if(sb)sb.classList.add('open');if(ov)ov.classList.add('open');renderCartItems();updateCartUI();}
+function closeCart(){const sb=document.getElementById('cartSidebar')||document.getElementById('cartSb');const ov=document.getElementById('cartOverlay')||document.getElementById('cartOv');if(sb)sb.classList.remove('open');if(ov)ov.classList.remove('open');}
+function showToast(msg,type='info'){let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t);}t.textContent=msg;t.className=`toast ${type} on show`;setTimeout(()=>t.classList.remove('on','show'),3200);}
+function setupReveal(){const o=new IntersectionObserver(e=>{e.forEach(x=>{if(!x.isIntersecting)return;setTimeout(()=>x.target.classList.add('v','visible'),parseInt(x.target.dataset.delay||0));o.unobserve(x.target);});},{threshold:.08});document.querySelectorAll('.rv,.rv-l,.rv-r,.rv-s,.reveal,.reveal-left,.reveal-right').forEach(el=>o.observe(el));}
+function renderNav(a=''){const el=document.getElementById('nav');if(!el)return;el.innerHTML=`<nav class="nav" id="navBar" style="position:fixed;top:0;left:0;right:0;z-index:500;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 4vw;transition:background .5s;"><a href="index.html" style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;letter-spacing:.22em;color:#fff;text-transform:uppercase;text-decoration:none;">Manufaktura Flowers</a><div style="display:flex;align-items:center;gap:2rem;"><a href="shop.html" style="font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.65);text-decoration:none;">Magazin</a><a href="events.html" style="font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.65);text-decoration:none;">Evenimente</a><a href="orders.html" style="font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.65);text-decoration:none;">Comenzi</a></div><div style="display:flex;align-items:center;gap:1rem;"><button onclick="openCart()" style="background:none;border:none;color:#fff;font-size:1.1rem;position:relative;">🛒<span class="cb" style="position:absolute;top:-3px;right:-3px;background:#b8637a;color:#fff;width:17px;height:17px;border-radius:50%;font-size:.58rem;display:flex;align-items:center;justify-content:center;"></span></button><a href="shop.html" style="font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;border:1px solid rgba(255,255,255,.35);color:#fff;padding:.6rem 1.6rem;transition:all .3s;">Comandă Acum</a></div></nav>`;const n=document.getElementById('navBar');window.addEventListener('scroll',()=>n.classList.toggle('solid',scrollY>60),{passive:true});n.style.background='rgba(14,10,8,0)';n.classList.add('solid');updateCartUI();}
+function renderCartSidebar(){if(document.getElementById('cartSidebar'))return;document.body.insertAdjacentHTML('beforeend',`<div onclick="closeCart()" style="position:fixed;inset:0;background:rgba(14,10,8,.65);z-index:699;opacity:0;pointer-events:none;transition:opacity .5s;backdrop-filter:blur(6px);" id="cartOverlay" class="cart-ov"></div><div id="cartSidebar" class="cart-sb" style="position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:700;box-shadow:-16px 0 60px rgba(0,0,0,.2);transform:translateX(105%);transition:transform .5s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;"><div style="padding:2rem;border-bottom:1px solid #f0e8dc;display:flex;justify-content:space-between;align-items:center;"><h3 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;">Coșul Meu</h3><button onclick="closeCart()" style="background:none;border:1px solid #ddd;width:36px;height:36px;font-size:1rem;color:#999;">✕</button></div><div id="cartItems" style="flex:1;overflow-y:auto;padding:1.5rem 2rem;"></div><div style="padding:2rem;border-top:1px solid #f0e8dc;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;"><span style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#999;">Total</span><strong class="ctv" style="font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;">0 lei</strong></div><a href="checkout.html" onclick="closeCart()" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#b8637a;color:#fff;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;padding:1rem;width:100%;">Finalizează / Checkout →</a></div></div>`);}
+function renderFooter(){const el=document.getElementById('footer');if(!el)return;el.innerHTML=`<footer style="background:#0e0a08;padding:5rem 5vw 2.5rem;"><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem;margin-bottom:4rem;"><div><a href="index.html" style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;letter-spacing:.22em;color:#fff;text-transform:uppercase;display:block;margin-bottom:.3rem;">Manufaktura Flowers</a><div style="font-size:.52rem;letter-spacing:.35em;color:#7a6858;margin-bottom:1.5rem;">Premium Floral Studio · Constanța</div><p style="font-size:.82rem;color:rgba(255,255,255,.4);line-height:1.9;">Str. Eliberarii 48, Constanța<br><a href="tel:+40733804144" style="color:#d4909f;">0733 804 144</a><br><a href="mailto:manufakturaflowers@gmail.com" style="color:#d4909f;">manufakturaflowers@gmail.com</a></p></div><div><h5 style="font-size:.52rem;letter-spacing:.38em;text-transform:uppercase;color:#b8637a;margin-bottom:1.2rem;">Magazin / Shop</h5><a href="shop.html" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Toate Buchetele</a><a href="shop.html?cat=Romantic" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Romantic</a><a href="shop.html?cat=Nuntă" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Nuntă / Wedding</a><a href="shop.html?cat=Cadou" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Cadouri / Gifts</a></div><div><h5 style="font-size:.52rem;letter-spacing:.38em;text-transform:uppercase;color:#b8637a;margin-bottom:1.2rem;">Servicii / Services</h5><a href="events.html" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Nunți / Weddings</a><a href="events.html" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Botezuri / Baptisms</a><a href="events.html" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Corporate Events</a></div><div><h5 style="font-size:.52rem;letter-spacing:.38em;text-transform:uppercase;color:#b8637a;margin-bottom:1.2rem;">Info</h5><a href="orders.html" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Comenzile Mele</a><a href="index.html#despre" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Despre Noi</a><a href="https://www.instagram.com/manufakturaflowers" target="_blank" style="display:block;color:rgba(255,255,255,.4);font-size:.82rem;margin-bottom:.5rem;">Instagram</a></div></div><div style="border-top:1px solid rgba(255,255,255,.06);padding-top:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;"><p style="font-size:.62rem;color:rgba(255,255,255,.22);">© 2025 Manufaktura Flowers · Constanța · All rights reserved</p><div style="display:flex;gap:.7rem;"><a href="https://www.instagram.com/manufakturaflowers" target="_blank" style="width:36px;height:36px;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);">📷</a><a href="tel:+40733804144" style="width:36px;height:36px;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);">📞</a></div></div></footer>`;}

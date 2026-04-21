@@ -105,7 +105,7 @@ const STATUS_LABELS = {'nouă':'Nouă','confirmată':'Confirmată','pregătire':
 
 async function loadOrders(){
   // Load last order from localStorage first
-  const lastOrder = JSON.parse(localStorage.getItem('mf_last_order')||'null');
+  const lastOrder = JSON.parse(localStorage.getItem('mf3_last_order')||'null');
   if(lastOrder) allOrders = [lastOrder];
 
   await initSupabase();

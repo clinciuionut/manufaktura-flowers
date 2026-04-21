@@ -44,7 +44,7 @@
 <script>
 renderNav();
 renderFooter();
-const order = JSON.parse(localStorage.getItem('mf_last_order')||'{}');
+const order = JSON.parse(localStorage.getItem('mf3_last_order')||'{}');
 if(order.id){
   document.getElementById('orderId').textContent = 'Comanda #'+order.id;
   const items = JSON.parse(order.items||'[]');
