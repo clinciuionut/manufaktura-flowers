@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Finalizează Comanda — Manufaktura Flowers</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.checkout-page{min-height:100vh;padding:9rem 5vw 5rem;display:grid;grid-template-columns:1fr 420px;gap:3rem;align-items:start;}
+.checkout-left h1{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;margin-bottom:2.5rem;}
+
+/* STEPS */
+.steps{display:flex;gap:0;margin-bottom:2.5rem;border-bottom:1px solid var(--cream2);}
+.step{padding:.8rem 1.5rem;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;}
+.step.active{color:var(--rose);border-bottom-color:var(--rose);}
+.step.done{color:var(--green);}
+.step-panel{display:none;}.step-panel.active{display:block;}
+
+/* SECTION CARD */
+.form-card{background:#fff;border:1px solid var(--cream2);padding:2rem;margin-bottom:1.5rem;}
+.form-card h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;margin-bottom:1.5rem;display:flex;align-items:center;gap:.6rem;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+
+/* CALENDAR */
+.cal-wrap{border:1px solid #d8cfc4;padding:1.2rem;}
+.cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;}
+.cal-header span{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:400;}
+.cal-nav-btn{background:none;border:1px solid #d8cfc4;width:28px;height:28px;cursor:pointer;font-size:1rem;}
+.cal-labels{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:.3rem;}
+.cal-labels span{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:.2rem 0;}
+.cal-grid-co{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.82rem;cursor:pointer;transition:background .15s;}
+.cal-d:hover:not(.cal-empty-d):not(.cal-past-d){background:var(--cream2);}
+.cal-d.cal-empty-d,.cal-d.cal-past-d{color:#ccc;pointer-events:none;}
+.cal-d.cal-sel{background:var(--rose);color:#fff;}
+.cal-d.cal-today-d{font-weight:600;color:var(--rose);}
+
+/* TIME SLOTS */
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:1rem;}
+.time-slot{padding:.55rem;border:1px solid #d8cfc4;text-align:center;font-size:.78rem;cursor:pointer;transition:all .2s;}
+.time-slot:hover{border-color:var(--rose);color:var(--rose);}
+.time-slot.sel{background:var(--rose);color:#fff;border-color:var(--rose);}
+.time-slot.unavail{color:#ccc;pointer-events:none;background:var(--cream2);}
+
+/* PAYMENT */
+.pay-methods{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.5rem;}
+.pay-method{border:1px solid #d8cfc4;padding:1.2rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.8rem;transition:border-color .2s;}
+.pay-method.sel{border-color:var(--rose);background:rgba(200,118,138,.04);}
+.pay-method .pay-ico{font-size:1.5rem;flex-shrink:0;}
+.pay-method h4{font-size:.8rem;font-weight:500;margin-bottom:.1rem;}
+.pay-method p{font-size:.7rem;color:var(--muted);}
+.card-fields{display:none;}.card-fields.show{display:block;}
+
+/* ORDER SUMMARY */
+.order-summary{background:#fff;border:1px solid var(--cream2);padding:1.8rem;position:sticky;top:90px;}
+.order-summary h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;margin-bottom:1.5rem;}
+.sum-item{display:flex;gap:1rem;padding:.8rem 0;border-bottom:1px solid var(--cream2);}
+.sum-img{width:56px;height:56px;object-fit:cover;flex-shrink:0;}
+.sum-info{flex:1;}
+.sum-name{font-size:.85rem;font-weight:500;margin-bottom:.2rem;}
+.sum-qty{font-size:.75rem;color:var(--muted);}
+.sum-price{font-size:.9rem;font-weight:500;color:var(--rose);}
+.sum-totals{margin-top:1.2rem;}
+.sum-row{display:flex;justify-content:space-between;font-size:.85rem;padding:.4rem 0;}
+.sum-row.total{border-top:1px solid var(--cream2);padding-top:.8rem;margin-top:.4rem;font-weight:500;}
+.sum-row.total span:last-child{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--rose);}
+.empty-cart{text-align:center;padding:3rem;color:var(--muted);}
+
+/* NAV BTNS */
+.nav-btns{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;}
+.nav-btns .btn-rose{flex:1;}
+
+@media(max-width:900px){
+  .checkout-page{grid-template-columns:1fr;}
+  .order-summary{position:static;}
+  .form-row{grid-template-columns:1fr;}
+  .pay-methods{grid-template-columns:1fr;}
+  .time-grid{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+<div id="nav"></div>
+
+<div class="checkout-page">
+  <div class="checkout-left">
+    <h1>Finalizează Comanda</h1>
+
+    <div class="steps">
+      <div class="step active" id="step1tab" onclick="goStep(1)">1. Livrare</div>
+      <div class="step" id="step2tab" onclick="goStep(2)">2. Programare</div>
+      <div class="step" id="step3tab" onclick="goStep(3)">3. Plată</div>
+    </div>
+
+    <!-- STEP 1: DELIVERY -->
+    <div class="step-panel active" id="step1">
+      <div class="form-card">
+        <h3>📍 Adresa de Livrare</h3>
+        <div class="form-group"><label>Nume Complet *</label><input type="text" id="dName" placeholder="Prenume Nume"></div>
+        <div class="form-group"><label>Telefon *</label><input type="tel" id="dPhone" placeholder="07xx xxx xxx"></div>
+        <div class="form-group"><label>Email *</label><input type="email" id="dEmail" placeholder="email@exemplu.com"></div>
+        <div class="form-group"><label>Stradă și Număr *</label><input type="text" id="dStreet" placeholder="Str. Exemplu, nr. 1"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Oraș *</label>
+            <select id="dCity">
+              <option>Constanța</option><option>Ovidiu</option>
+              <option>Năvodari</option><option>Valu lui Traian</option><option>Altul</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Bloc / Apart. (opțional)</label><input type="text" id="dApt" placeholder="Bl. X, Ap. Y"></div>
+        </div>
+        <div class="form-group"><label>Mesaj pe card (opțional)</label><textarea id="dMsg" rows="2" placeholder="Un mesaj frumos pentru destinatar…"></textarea></div>
+        <div class="form-error" id="step1err"></div>
+      </div>
+      <div class="nav-btns"><button class="btn-rose" onclick="nextStep(1)">Continuă → Programare</button></div>
+    </div>
+
+    <!-- STEP 2: SCHEDULING -->
+    <div class="step-panel" id="step2">
+      <div class="form-card">
+        <h3>📅 Programează Livrarea</h3>
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;">Alege data și intervalul orar pentru livrare. Livrăm Luni–Sâmbătă între 09:00–20:00.</p>
+        <label style="font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;display:block;">Selectează Data</label>
+        <div class="cal-wrap">
+          <div class="cal-header">
+            <button class="cal-nav-btn" onclick="prevM()">‹</button>
+            <span id="calTitle2"></span>
+            <button class="cal-nav-btn" onclick="nextM()">›</button>
+          </div>
+          <div class="cal-labels">
+            <span>Lu</span><span>Ma</span><span>Mi</span><span>Jo</span><span>Vi</span><span>Sâ</span><span>Du</span>
+          </div>
+          <div class="cal-grid-co" id="calGrid2"></div>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <label style="font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;display:block;">Interval Orar</label>
+          <div class="time-grid">
+            <div class="time-slot" onclick="selTime(this,'09:00–11:00')">09:00–11:00</div>
+            <div class="time-slot" onclick="selTime(this,'11:00–13:00')">11:00–13:00</div>
+            <div class="time-slot" onclick="selTime(this,'13:00–15:00')">13:00–15:00</div>
+            <div class="time-slot" onclick="selTime(this,'15:00–17:00')">15:00–17:00</div>
+            <div class="time-slot" onclick="selTime(this,'17:00–19:00')">17:00–19:00</div>
+            <div class="time-slot" onclick="selTime(this,'19:00–20:00')">19:00–20:00</div>
+            <div class="time-slot unavail">Indisponibil</div>
+            <div class="time-slot" onclick="selTime(this,'Cât mai repede')">⚡ ASAP</div>
+          </div>
+        </div>
+        <div id="selDateDisplay" style="margin-top:1rem;font-size:.85rem;color:var(--rose);min-height:1.2rem;"></div>
+        <div class="form-error" id="step2err"></div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-outline" onclick="goStep(1)">← Înapoi</button>
+        <button class="btn-rose" onclick="nextStep(2)">Continuă → Plată</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PAYMENT -->
+    <div class="step-panel" id="step3">
+      <div class="form-card">
+        <h3>💳 Metodă de Plată</h3>
+        <div class="pay-methods">
+          <div class="pay-method sel" id="pm-card" onclick="selPay('card')">
+            <div class="pay-ico">💳</div>
+            <div><h4>Card Bancar</h4><p>Visa, Mastercard, Maestro</p></div>
+          </div>
+          <div class="pay-method" id="pm-apple" onclick="selPay('apple')">
+            <div class="pay-ico">🍎</div>
+            <div><h4>Apple Pay</h4><p>Plată rapidă cu iPhone</p></div>
+          </div>
+          <div class="pay-method" id="pm-google" onclick="selPay('google')">
+            <div class="pay-ico">🔵</div>
+            <div><h4>Google Pay</h4><p>Plată rapidă cu Android</p></div>
+          </div>
+          <div class="pay-method" id="pm-cash" onclick="selPay('cash')">
+            <div class="pay-ico">💵</div>
+            <div><h4>Cash la Livrare</h4><p>Plătești la primire</p></div>
+          </div>
+        </div>
+        <div class="card-fields show" id="cardFields">
+          <div class="form-group"><label>Număr Card</label><input type="text" id="cardNr" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCard(this)"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Expiră (LL/AA)</label><input type="text" id="cardExp" placeholder="12/26" maxlength="5"></div>
+            <div class="form-group"><label>CVV</label><input type="text" id="cardCvv" placeholder="123" maxlength="4"></div>
+          </div>
+          <div class="form-group"><label>Nume pe Card</label><input type="text" id="cardName" placeholder="PRENUME NUME"></div>
+        </div>
+        <div class="form-error" id="step3err"></div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-outline" onclick="goStep(2)">← Înapoi</button>
+        <button class="btn-rose" id="placeBtn" onclick="placeOrder()">✓ Plasează Comanda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER SUMMARY -->
+  <div class="order-summary" id="orderSummary">
+    <h3>Sumar Comandă</h3>
+    <div id="sumItems"></div>
+    <div class="sum-totals" id="sumTotals"></div>
+  </div>
+</div>
+
+<div id="footer"></div>
+<div class="toast"></div>
+<script src="app.js"></script>
+<script>
+renderNav();
+renderCartSidebar();
+renderFooter();
+
+// Render summary
+function renderSummary(){
+  const si = document.getElementById('sumItems');
+  const st = document.getElementById('sumTotals');
+  if(!cart.length){si.innerHTML='<div class="empty-cart"><p>Coșul e gol</p><a href="shop.html" style="color:var(--rose)">← Magazin</a></div>';st.innerHTML='';return;}
+  si.innerHTML = cart.map(i=>`
+  <div class="sum-item">
+    <img class="sum-img" src="${i.img}" alt="${i.name}">
+    <div class="sum-info"><div class="sum-name">${i.name}</div><div class="sum-qty">× ${i.qty}</div></div>
+    <div class="sum-price">${i.price*i.qty} lei</div>
+  </div>`).join('');
+  const sub = getCartTotal();
+  const del = sub > 0 ? 20 : 0;
+  st.innerHTML = `
+  <div class="sum-row"><span>Subtotal</span><span>${sub} lei</span></div>
+  <div class="sum-row"><span>Livrare</span><span>${del} lei</span></div>
+  <div class="sum-row total"><span>Total</span><span>${sub+del} lei</span></div>`;
+}
+renderSummary();
+
+// Steps
+let curStep = 1;
+function goStep(n){
+  if(n>curStep) return;
+  curStep=n;
+  document.querySelectorAll('.step-panel').forEach((p,i)=>p.classList.toggle('active',i+1===n));
+  document.querySelectorAll('.step').forEach((s,i)=>{
+    s.classList.remove('active','done');
+    if(i+1===n) s.classList.add('active');
+    else if(i+1<n) s.classList.add('done');
+  });
+}
+function nextStep(from){
+  if(from===1){
+    const name=document.getElementById('dName').value;
+    const phone=document.getElementById('dPhone').value;
+    const street=document.getElementById('dStreet').value;
+    if(!name||!phone||!street){document.getElementById('step1err').textContent='Completează toate câmpurile obligatorii.';return;}
+    document.getElementById('step1err').textContent='';
+  }
+  if(from===2){
+    if(!selDate){document.getElementById('step2err').textContent='Selectează data livrării.';return;}
+    if(!selTimeVal){document.getElementById('step2err').textContent='Selectează intervalul orar.';return;}
+    document.getElementById('step2err').textContent='';
+  }
+  curStep=from+1;
+  document.querySelectorAll('.step-panel').forEach((p,i)=>p.classList.toggle('active',i+1===curStep));
+  document.querySelectorAll('.step').forEach((s,i)=>{
+    s.classList.remove('active','done');
+    if(i+1===curStep) s.classList.add('active');
+    else if(i+1<curStep) s.classList.add('done');
+  });
+}
+
+// CALENDAR
+let calY, calM, selDate=null;
+const MO=['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+function initCal2(){const n=new Date();calY=n.getFullYear();calM=n.getMonth();renderCal2();}
+function prevM(){calM--;if(calM<0){calM=11;calY--;}renderCal2();}
+function nextM(){calM++;if(calM>11){calM=0;calY++;}renderCal2();}
+function renderCal2(){
+  document.getElementById('calTitle2').textContent=MO[calM]+' '+calY;
+  const today=new Date();today.setHours(0,0,0,0);
+  const first=new Date(calY,calM,1).getDay();
+  const days=new Date(calY,calM+1,0).getDate();
+  const offset=(first===0)?6:first-1;
+  let html='';
+  for(let i=0;i<offset;i++) html+='<div class="cal-d cal-empty-d"></div>';
+  for(let d=1;d<=days;d++){
+    const date=new Date(calY,calM,d);date.setHours(0,0,0,0);
+    const isPast=date<today;
+    const isSun=date.getDay()===0;
+    const isSel=selDate&&date.getTime()===selDate.getTime();
+    const isToday=date.getTime()===today.getTime();
+    let cls='cal-d';
+    if(isPast||isSun) cls+=' cal-past-d';
+    if(isSel) cls+=' cal-sel';
+    if(isToday) cls+=' cal-today-d';
+    html+=`<div class="${cls}" onclick="pickDate(${calY},${calM},${d})">${d}</div>`;
+  }
+  document.getElementById('calGrid2').innerHTML=html;
+}
+function pickDate(y,m,d){
+  selDate=new Date(y,m,d);
+  renderCal2();
+  updateSelDisplay();
+}
+function updateSelDisplay(){
+  const el=document.getElementById('selDateDisplay');
+  if(selDate&&selTimeVal) el.textContent=`✓ Livrare: ${selDate.getDate()}/${selDate.getMonth()+1}/${selDate.getFullYear()} · ${selTimeVal}`;
+  else if(selDate) el.textContent=`Data: ${selDate.getDate()}/${selDate.getMonth()+1}/${selDate.getFullYear()} — Acum selectează ora`;
+  else el.textContent='';
+}
+initCal2();
+
+// TIME
+let selTimeVal=null;
+function selTime(el,val){
+  document.querySelectorAll('.time-slot').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+  selTimeVal=val;
+  updateSelDisplay();
+}
+
+// PAYMENT
+let payMethod='card';
+function selPay(m){
+  payMethod=m;
+  ['card','apple','google','cash'].forEach(x=>document.getElementById('pm-'+x).classList.remove('sel'));
+  document.getElementById('pm-'+m).classList.add('sel');
+  document.getElementById('cardFields').classList.toggle('show',m==='card');
+}
+function fmtCard(el){el.value=el.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim();}
+
+// PLACE ORDER
+async function placeOrder(){
+  if(!cart.length){showToast('Coșul tău e gol.','error');return;}
+  const btn=document.getElementById('placeBtn');
+  btn.textContent='Se procesează…';btn.disabled=true;
+
+  await initSupabase();
+  const orderData={
+    id: 'MF-'+Date.now(),
+    name: document.getElementById('dName').value,
+    phone: document.getElementById('dPhone').value,
+    email: document.getElementById('dEmail').value,
+    address: document.getElementById('dStreet').value+', '+document.getElementById('dCity').value+(document.getElementById('dApt').value?' - '+document.getElementById('dApt').value:''),
+    message: document.getElementById('dMsg').value,
+    delivery_date: selDate?`${selDate.getDate()}/${selDate.getMonth()+1}/${selDate.getFullYear()}`:'',
+    delivery_time: selTimeVal||'',
+    payment_method: payMethod,
+    items: JSON.stringify(cart),
+    total: getCartTotal()+20,
+    status: 'nouă',
+    created_at: new Date().toISOString()
+  };
+
+  if(supabase){
+    await supabase.from('orders').insert(orderData);
+  }
+
+  // Save order for confirmation page
+  localStorage.setItem('mf_last_order', JSON.stringify(orderData));
+  cart=[];saveCart();
+  window.location.href='confirmation.html';
+}
+</script>
+</body>
+</html>

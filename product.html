@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Produs — Manufaktura Flowers</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.product-page{display:grid;grid-template-columns:1fr 480px;gap:5rem;padding:9rem 5vw 5rem;align-items:start;}
+.prod-gallery{position:sticky;top:90px;}
+.prod-main-img{width:100%;aspect-ratio:3/4;object-fit:cover;margin-bottom:3px;cursor:zoom-in;}
+.prod-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+.prod-thumb{aspect-ratio:1;object-fit:cover;cursor:pointer;opacity:.6;transition:opacity .2s;border:2px solid transparent;}
+.prod-thumb.active{opacity:1;border-color:var(--rose);}
+.prod-info .tag{margin-bottom:1rem;}
+.prod-info h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3.5vw,3rem);font-weight:300;line-height:1.1;margin-bottom:.5rem;}
+.prod-rating{display:flex;align-items:center;gap:.5rem;color:var(--rose);font-size:.9rem;margin-bottom:1.5rem;}
+.prod-rating span{font-size:.78rem;color:var(--muted);}
+.prod-price{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:var(--rose);margin-bottom:.5rem;}
+.prod-old{font-size:1rem;text-decoration:line-through;color:var(--muted);font-family:'Jost',sans-serif;margin-left:.5rem;}
+.prod-desc{font-size:.9rem;line-height:1.82;color:var(--muted);margin:1.5rem 0;}
+.prod-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2rem;}
+.prod-tag{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .8rem;background:var(--cream2);color:var(--muted);}
+.qty-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}
+.qty-label{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.qty-ctrl{display:flex;align-items:center;gap:.5rem;}
+.qty-btn{width:36px;height:36px;border:1px solid #d8cfc4;background:#fff;cursor:pointer;font-size:1.1rem;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.qty-btn:hover{border-color:var(--rose);color:var(--rose);}
+.qty-num{font-size:1rem;min-width:32px;text-align:center;font-weight:500;}
+.add-row{display:flex;gap:.8rem;margin-bottom:2rem;flex-wrap:wrap;}
+.add-row .btn-rose{flex:1;}
+.prod-features{border-top:1px solid var(--cream2);padding-top:1.5rem;}
+.feat-row{display:flex;align-items:center;gap:1rem;padding:.7rem 0;border-bottom:1px solid var(--cream2);font-size:.88rem;}
+.feat-ico{font-size:1.1rem;flex-shrink:0;}
+.feat-row span{color:var(--muted);}
+
+.similar-section{padding:4rem 5vw 6rem;background:var(--cream2);}
+.similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2px;margin-top:2rem;}
+.sim-card{display:block;text-decoration:none;background:#fff;}
+.sim-card img{width:100%;aspect-ratio:3/4;object-fit:cover;transition:transform .5s;display:block;}
+.sim-card:hover img{transform:scale(1.05);}
+.sim-body{padding:1rem 1.2rem;}
+.sim-body h4{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:400;margin-bottom:.2rem;}
+.sim-body p{font-size:.75rem;color:var(--muted);}
+
+@media(max-width:900px){
+  .product-page{grid-template-columns:1fr;padding:8rem 5vw 4rem;}
+  .prod-gallery{position:static;}
+}
+</style>
+</head>
+<body>
+<div id="nav"></div>
+
+<div class="product-page" id="productPage">
+  <div class="prod-gallery">
+    <img class="prod-main-img" id="mainImg" src="" alt="">
+    <div class="prod-thumbs" id="thumbs"></div>
+  </div>
+  <div class="prod-info" id="prodInfo">
+    <div style="color:var(--muted);font-size:.9rem;padding:4rem 0;">Se încarcă…</div>
+  </div>
+</div>
+
+<section class="similar-section">
+  <div class="tag">S-ar putea să îți placă</div>
+  <h2 class="sec-title">Produse Similare</h2>
+  <div class="similar-grid" id="simGrid"></div>
+</section>
+
+<div id="footer"></div>
+<div class="toast"></div>
+<script src="app.js"></script>
+<script>
+renderNav();
+renderCartSidebar();
+renderFooter();
+
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+const p = PRODUCTS.find(x=>x.id===id);
+let qty = 1;
+
+if(!p){
+  document.getElementById('prodInfo').innerHTML='<h2>Produs negăsit</h2><a href="shop.html">← Înapoi la magazin</a>';
+} else {
+  document.title = p.name + ' — Manufaktura Flowers';
+  // Gallery
+  const imgs = [p.img, p.img2,
+    'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=700&q=80',
+    'https://images.unsplash.com/photo-1490750967868-88df5691cc9e?w=700&q=80'
+  ];
+  document.getElementById('mainImg').src = p.img;
+  document.getElementById('mainImg').alt = p.name;
+  document.getElementById('thumbs').innerHTML = imgs.map((src,i)=>
+    `<img class="prod-thumb ${i===0?'active':''}" src="${src}" alt="" onclick="setImg(this,'${src}')" loading="lazy">`
+  ).join('');
+
+  // Info
+  document.getElementById('prodInfo').innerHTML = `
+    <div class="tag">${p.category}</div>
+    <h1>${p.name}</h1>
+    <div class="prod-rating">★★★★★ <span>(4.9 · 28 recenzii)</span></div>
+    <div class="prod-price">${p.price} lei${p.oldPrice?`<span class="prod-old">${p.oldPrice} lei</span>`:''}</div>
+    <p class="prod-desc">${p.desc}</p>
+    <div class="prod-tags">${p.tags.map(t=>`<span class="prod-tag">${t}</span>`).join('')}</div>
+    <div class="qty-row">
+      <span class="qty-label">Cantitate</span>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span class="qty-num" id="qtyDisplay">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+    </div>
+    <div class="add-row">
+      <button class="btn-rose" onclick="handleAdd()">🛒 Adaugă în Coș</button>
+      <a href="checkout.html?direct=${p.id}" class="btn-dark">Comandă Acum →</a>
+    </div>
+    <div class="prod-features">
+      <div class="feat-row"><span class="feat-ico">🚚</span><span>Livrare în 2–4 ore în Constanța</span></div>
+      <div class="feat-row"><span class="feat-ico">🌸</span><span>Flori proaspete, aranjate în ziua livrării</span></div>
+      <div class="feat-row"><span class="feat-ico">📅</span><span>Programează livrarea la data și ora dorită</span></div>
+      <div class="feat-row"><span class="feat-ico">💳</span><span>Plată sigură — Card, Apple Pay, Google Pay</span></div>
+      <div class="feat-row"><span class="feat-ico">📞</span><span>Suport: <a href="tel:+40733804144" style="color:var(--rose);">0733 804 144</a></span></div>
+    </div>`;
+
+  // Similar
+  const sim = PRODUCTS.filter(x=>x.id!==id&&x.category===p.category).slice(0,4);
+  document.getElementById('simGrid').innerHTML = sim.map(x=>
+    `<a href="product.html?id=${x.id}" class="sim-card">
+      <img src="${x.img}" alt="${x.name}" loading="lazy">
+      <div class="sim-body"><h4>${x.name}</h4><p>${x.price} lei</p></div>
+    </a>`
+  ).join('');
+}
+
+function setImg(el, src){
+  document.getElementById('mainImg').src = src;
+  document.querySelectorAll('.prod-thumb').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function changeQty(d){qty=Math.max(1,qty+d);document.getElementById('qtyDisplay').textContent=qty;}
+function handleAdd(){addToCart(id,qty);}
+</script>
+</body>
+</html>

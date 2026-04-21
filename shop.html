@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Magazin — Manufaktura Flowers</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.page-hero{padding:9rem 5vw 3.5rem;background:var(--dark2);color:#fff;position:relative;overflow:hidden;}
+.page-hero::after{content:'';position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1487530811015-780c4fbc6fbb?w=1400&q=70') center/cover;opacity:.12;z-index:0;}
+.page-hero-inner{position:relative;z-index:1;}
+.page-hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:300;line-height:1.1;margin-bottom:.5rem;}
+.page-hero p{font-size:.9rem;color:rgba(255,255,255,.6);max-width:500px;line-height:1.7;}
+
+.filter-bar{background:#fff;border-bottom:1px solid var(--cream2);padding:1rem 5vw;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;position:sticky;top:70px;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.filter-bar input,.filter-bar select{border:1px solid #d8cfc4;padding:.6rem 1rem;font-family:'Jost',sans-serif;font-size:.85rem;color:var(--dark);outline:none;background:#fff;transition:border-color .2s;}
+.filter-bar input:focus,.filter-bar select:focus{border-color:var(--rose);}
+.filter-bar input{flex:1;min-width:180px;}
+.results-count{font-size:.72rem;color:var(--muted);letter-spacing:.08em;margin-left:auto;}
+.clear-btn{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;}
+.clear-btn:hover{color:var(--rose);}
+
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2px;padding:3rem 5vw 6rem;}
+.product-card{background:#fff;cursor:pointer;display:block;text-decoration:none;transition:box-shadow .3s;}
+.product-card:hover{box-shadow:0 12px 40px rgba(200,118,138,.15);}
+.pc-img{position:relative;overflow:hidden;}
+.pc-img img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform .6s;}
+.product-card:hover .pc-img img{transform:scale(1.06);}
+.pc-badge{position:absolute;top:.8rem;left:.8rem;background:var(--rose);color:#fff;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;padding:.2rem .6rem;}
+.pc-body{padding:1.3rem 1.4rem;}
+.pc-cat{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:.3rem;}
+.pc-body h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;margin-bottom:.5rem;line-height:1.2;}
+.pc-footer{display:flex;justify-content:space-between;align-items:center;}
+.pc-price{font-family:'Cormorant Garamond',serif;font-size:1.2rem;}
+.pc-old{font-size:.75rem;text-decoration:line-through;color:var(--muted);margin-left:.3rem;}
+.pc-add{background:var(--rose);color:#fff;border:none;width:34px;height:34px;font-size:1.1rem;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;}
+.pc-add:hover{background:var(--dark);}
+.no-results{text-align:center;padding:5rem;color:var(--muted);}
+.no-results h3{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:.8rem;}
+
+@media(max-width:600px){.shop-grid{grid-template-columns:repeat(2,1fr);padding:2rem 2vw 4rem;}}
+</style>
+</head>
+<body>
+<div id="nav"></div>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="tag" style="color:var(--rose2);">Magazin</div>
+    <h1 id="pageTitle">Toate Buchetele</h1>
+    <p>Buchete și aranjamente florale create cu pasiune, proaspete și livrate la ușa ta în Constanța.</p>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <input type="text" id="fSearch" placeholder="🔍  Caută buchete…">
+  <select id="fCat">
+    <option value="">Toate categoriile</option>
+    <option>Romantic</option><option>Nuntă</option>
+    <option>Cadou</option><option>Sezonier</option><option>Aranjament</option>
+  </select>
+  <select id="fPrice">
+    <option value="">Orice preț</option>
+    <option value="0-150">Sub 150 lei</option>
+    <option value="150-250">150–250 lei</option>
+    <option value="250-999">Peste 250 lei</option>
+  </select>
+  <select id="fSort">
+    <option value="">Sortează</option>
+    <option value="price-asc">Preț ↑</option>
+    <option value="price-desc">Preț ↓</option>
+    <option value="promo">Promoții</option>
+  </select>
+  <button class="clear-btn" onclick="clearFilters()">✕ Resetează</button>
+  <span class="results-count" id="countEl"></span>
+</div>
+
+<div class="shop-grid" id="shopGrid"></div>
+<div class="no-results" id="noResults" style="display:none;">
+  <h3>Niciun buchet găsit 🌸</h3>
+  <p>Încearcă alte filtre sau <a href="shop.html" style="color:var(--rose);">resetează căutarea</a>.</p>
+</div>
+
+<div id="footer"></div>
+<div class="toast"></div>
+<script src="app.js"></script>
+<script>
+renderNav('shop');
+renderCartSidebar();
+renderFooter();
+
+const params = new URLSearchParams(location.search);
+const initCat = params.get('cat')||'';
+document.getElementById('fCat').value = initCat;
+if(initCat) document.getElementById('pageTitle').textContent = initCat;
+
+function getFiltered(){
+  const q = document.getElementById('fSearch').value.toLowerCase();
+  const cat = document.getElementById('fCat').value;
+  const price = document.getElementById('fPrice').value;
+  const sort = document.getElementById('fSort').value;
+  let res = PRODUCTS.filter(p => {
+    const mq = !q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || p.tags.some(t=>t.toLowerCase().includes(q));
+    const mc = !cat || p.category===cat;
+    let mp = true;
+    if(price){const [mn,mx]=price.split('-').map(Number);mp=p.price>=mn&&p.price<=mx;}
+    return mq&&mc&&mp;
+  });
+  if(sort==='price-asc') res.sort((a,b)=>a.price-b.price);
+  else if(sort==='price-desc') res.sort((a,b)=>b.price-a.price);
+  else if(sort==='promo') res=res.filter(p=>p.oldPrice).concat(res.filter(p=>!p.oldPrice));
+  return res;
+}
+
+function render(){
+  const res = getFiltered();
+  const grid = document.getElementById('shopGrid');
+  const nr = document.getElementById('noResults');
+  document.getElementById('countEl').textContent = `${res.length} buchet${res.length!==1?'e':''}`;
+  if(!res.length){grid.innerHTML='';nr.style.display='block';return;}
+  nr.style.display='none';
+  grid.innerHTML = res.map(p=>`
+  <a href="product.html?id=${p.id}" class="product-card reveal">
+    <div class="pc-img">
+      <img src="${p.img}" alt="${p.name}" loading="lazy">
+      ${p.oldPrice?'<div class="pc-badge">Reducere</div>':''}
+    </div>
+    <div class="pc-body">
+      <div class="pc-cat">${p.category}</div>
+      <h3>${p.name}</h3>
+      <div class="pc-footer">
+        <div class="pc-price">${p.price} lei${p.oldPrice?`<span class="pc-old">${p.oldPrice} lei</span>`:''}</div>
+        <button class="pc-add" onclick="event.preventDefault();addToCart('${p.id}')">+</button>
+      </div>
+    </div>
+  </a>`).join('');
+  setupReveal();
+}
+
+['fSearch','fCat','fPrice','fSort'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',render);
+  document.getElementById(id).addEventListener('change',render);
+});
+function clearFilters(){['fSearch','fCat','fPrice','fSort'].forEach(id=>document.getElementById(id).value='');render();}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comandă Confirmată — Manufaktura Flowers</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.confirm-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:7rem 5vw;text-align:center;}
+.confirm-box{max-width:580px;width:100%;}
+.confirm-icon{font-size:4rem;margin-bottom:1.5rem;animation:pop .5s ease;}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.confirm-box h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:300;line-height:1.1;margin-bottom:1rem;}
+.confirm-box p{font-size:.95rem;line-height:1.75;color:var(--muted);margin-bottom:1.5rem;}
+.order-id{display:inline-block;background:var(--cream2);padding:.5rem 1.5rem;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dark);margin-bottom:2rem;}
+.confirm-details{background:#fff;border:1px solid var(--cream2);padding:1.8rem;margin-bottom:2rem;text-align:left;}
+.confirm-details h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;margin-bottom:1.2rem;}
+.cd-row{display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--cream2);font-size:.85rem;}
+.cd-row:last-child{border-bottom:none;}
+.cd-row span:first-child{color:var(--muted);}
+.cd-row span:last-child{font-weight:500;}
+.confirm-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+<div id="nav"></div>
+<div class="confirm-page">
+  <div class="confirm-box">
+    <div class="confirm-icon">🌸</div>
+    <h1>Comanda ta a fost plasată!</h1>
+    <p>Îți mulțumim pentru comandă! Echipa Manufaktura Flowers va pregăti buchetul tău cu drag și îl va livra la adresa specificată.</p>
+    <div class="order-id" id="orderId">Se încarcă...</div>
+    <div class="confirm-details" id="confirmDetails"></div>
+    <p style="font-size:.85rem;">Vei fi contactat telefonic pentru confirmare.<br>
+      <a href="tel:+40733804144" style="color:var(--rose);">0733 804 144</a> · 
+      <a href="mailto:manufakturaflowers@gmail.com" style="color:var(--rose);">manufakturaflowers@gmail.com</a></p>
+    <div class="confirm-btns">
+      <a href="orders.html" class="btn-rose">📦 Urmărește Comanda</a>
+      <a href="shop.html" class="btn-outline">← Continuă Cumpărăturile</a>
+    </div>
+  </div>
+</div>
+<div id="footer"></div>
+<script src="app.js"></script>
+<script>
+renderNav();
+renderFooter();
+const order = JSON.parse(localStorage.getItem('mf_last_order')||'{}');
+if(order.id){
+  document.getElementById('orderId').textContent = 'Comanda #'+order.id;
+  const items = JSON.parse(order.items||'[]');
+  document.getElementById('confirmDetails').innerHTML = `
+    <h3>Detalii Comandă</h3>
+    <div class="cd-row"><span>Nume</span><span>${order.name}</span></div>
+    <div class="cd-row"><span>Telefon</span><span>${order.phone}</span></div>
+    <div class="cd-row"><span>Adresă livrare</span><span>${order.address}</span></div>
+    <div class="cd-row"><span>Data livrării</span><span>${order.delivery_date}</span></div>
+    <div class="cd-row"><span>Interval orar</span><span>${order.delivery_time}</span></div>
+    <div class="cd-row"><span>Plată</span><span>${order.payment_method==='card'?'Card Bancar':order.payment_method==='apple'?'Apple Pay':order.payment_method==='google'?'Google Pay':'Cash la Livrare'}</span></div>
+    <div class="cd-row"><span>Buchete</span><span>${items.map(i=>i.name+' ×'+i.qty).join(', ')}</span></div>
+    <div class="cd-row"><span>Total</span><span style="color:var(--rose);font-size:1.1rem;">${order.total} lei</span></div>
+    ${order.message?`<div class="cd-row"><span>Mesaj card</span><span>"${order.message}"</span></div>`:''}`;
+}
+</script>
+</body>
+</html>

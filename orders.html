@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comenzile Mele — Manufaktura Flowers</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.orders-page{padding:9rem 5vw 5rem;}
+.orders-page h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:300;margin-bottom:.5rem;}
+.orders-page .sub{font-size:.9rem;color:var(--muted);margin-bottom:3rem;}
+
+/* SEARCH */
+.order-search{display:flex;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap;}
+.order-search input{flex:1;min-width:220px;border:1px solid #d8cfc4;padding:.8rem 1rem;font-family:'Jost',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;}
+.order-search input:focus{border-color:var(--rose);}
+
+/* ORDER CARD */
+.order-card{background:#fff;border:1px solid var(--cream2);margin-bottom:1.2rem;overflow:hidden;transition:box-shadow .2s;}
+.order-card:hover{box-shadow:0 6px 24px rgba(200,118,138,.1);}
+.order-header{padding:1.4rem 1.8rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;cursor:pointer;border-bottom:1px solid var(--cream2);}
+.order-id-label{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem;}
+.order-num{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;}
+.order-date{font-size:.78rem;color:var(--muted);}
+.status-badge{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;padding:.3rem .9rem;border-radius:0;}
+.status-nouă{background:rgba(201,169,110,.15);color:#a07030;border:1px solid rgba(201,169,110,.4);}
+.status-confirmată{background:rgba(74,103,65,.12);color:var(--green);border:1px solid rgba(74,103,65,.3);}
+.status-pregătire{background:rgba(200,118,138,.12);color:var(--rose);border:1px solid rgba(200,118,138,.3);}
+.status-livrare{background:rgba(52,120,200,.12);color:#1a5fa8;border:1px solid rgba(52,120,200,.3);}
+.status-livrată{background:rgba(39,174,96,.12);color:#1a7a42;border:1px solid rgba(39,174,96,.3);}
+.order-body{display:none;padding:1.5rem 1.8rem;}
+.order-body.open{display:block;}
+.od-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.5rem;margin-bottom:1.5rem;}
+.od-field h5{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem;}
+.od-field p{font-size:.88rem;color:var(--dark);line-height:1.5;}
+.order-items-list{border-top:1px solid var(--cream2);padding-top:1.2rem;}
+.oi-row{display:flex;align-items:center;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--cream2);}
+.oi-row:last-child{border-bottom:none;}
+.oi-img{width:48px;height:48px;object-fit:cover;flex-shrink:0;}
+.oi-name{flex:1;font-size:.88rem;}
+.oi-qty{font-size:.78rem;color:var(--muted);}
+.oi-price{font-size:.9rem;font-weight:500;color:var(--rose);}
+.progress-bar{display:flex;gap:0;margin-bottom:1.5rem;}
+.pb-step{flex:1;text-align:center;padding:.6rem .3rem;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;background:var(--cream2);color:var(--muted);border-right:2px solid var(--cream);}
+.pb-step:last-child{border-right:none;}
+.pb-step.done{background:var(--rose);color:#fff;}
+.pb-step.current{background:var(--dark2);color:#fff;}
+
+/* ADMIN NOTE */
+.admin-note{background:var(--dark2);color:#fff;padding:1rem 1.5rem;margin-bottom:.5rem;font-size:.82rem;border-left:3px solid var(--rose);}
+
+/* EMPTY */
+.empty-orders{text-align:center;padding:5rem;color:var(--muted);}
+.empty-orders h3{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:.8rem;}
+
+/* ADMIN PANEL */
+.admin-toggle{display:flex;align-items:center;gap:.8rem;margin-bottom:2rem;padding:1rem 1.5rem;background:#fff;border:1px solid var(--cream2);}
+.admin-toggle label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.admin-badge{background:var(--rose);color:#fff;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;padding:.2rem .6rem;}
+
+@media(max-width:700px){
+  .od-grid{grid-template-columns:1fr 1fr;}
+  .progress-bar{flex-wrap:wrap;}
+  .pb-step{min-width:30%;}
+}
+</style>
+</head>
+<body>
+<div id="nav"></div>
+<div class="orders-page">
+  <div class="tag">Comenzi</div>
+  <h1>Urmărire Comenzi</h1>
+  <p class="sub">Caută după numărul comenzii sau numărul de telefon pentru a vedea statusul livrării tale.</p>
+
+  <div class="admin-toggle">
+    <span class="admin-badge">Andrea</span>
+    <label>Mod Admin — vezi toate comenzile</label>
+    <input type="checkbox" id="adminMode" onchange="toggleAdmin()">
+  </div>
+
+  <div class="order-search">
+    <input type="text" id="searchOrder" placeholder="🔍  Caută după ID comandă sau telefon…" oninput="filterOrders()">
+    <select id="statusFilter" onchange="filterOrders()" style="border:1px solid #d8cfc4;padding:.8rem 1rem;font-family:'Jost',sans-serif;font-size:.85rem;outline:none;min-width:160px;">
+      <option value="">Toate statusurile</option>
+      <option>nouă</option><option>confirmată</option><option>pregătire</option><option>livrare</option><option>livrată</option>
+    </select>
+  </div>
+
+  <div id="ordersList"></div>
+  <div class="empty-orders" id="emptyOrders" style="display:none;">
+    <h3>Nicio comandă găsită 🌸</h3>
+    <p>Nu există comenzi cu aceste criterii. <a href="shop.html" style="color:var(--rose);">Comandă acum!</a></p>
+  </div>
+</div>
+<div id="footer"></div>
+<div class="toast"></div>
+<script src="app.js"></script>
+<script>
+renderNav();
+renderFooter();
+let allOrders = [];
+let isAdmin = false;
+
+const STATUSES = ['nouă','confirmată','pregătire','livrare','livrată'];
+const STATUS_LABELS = {'nouă':'Nouă','confirmată':'Confirmată','pregătire':'În Pregătire','livrare':'În Livrare','livrată':'Livrată'};
+
+async function loadOrders(){
+  // Load last order from localStorage first
+  const lastOrder = JSON.parse(localStorage.getItem('mf_last_order')||'null');
+  if(lastOrder) allOrders = [lastOrder];
+
+  await initSupabase();
+  if(supabase){
+    const {data,error} = await supabase.from('orders').select('*').order('created_at',{ascending:false});
+    if(!error&&data) allOrders = data;
+  }
+  renderOrders(allOrders);
+}
+
+function toggleAdmin(){
+  isAdmin = document.getElementById('adminMode').checked;
+  renderOrders(getFiltered());
+}
+
+function getFiltered(){
+  const q = document.getElementById('searchOrder').value.toLowerCase();
+  const s = document.getElementById('statusFilter').value;
+  return allOrders.filter(o=>{
+    const mq = !q || (o.id+'').toLowerCase().includes(q) || (o.phone||'').includes(q) || (o.name||'').toLowerCase().includes(q);
+    const ms = !s || o.status===s;
+    return mq&&ms;
+  });
+}
+
+function filterOrders(){ renderOrders(getFiltered()); }
+
+function renderOrders(orders){
+  const list = document.getElementById('ordersList');
+  const empty = document.getElementById('emptyOrders');
+  if(!orders.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  list.innerHTML = orders.map(o=>{
+    const items = typeof o.items==='string'?JSON.parse(o.items||'[]'):o.items||[];
+    const statusIdx = STATUSES.indexOf(o.status||'nouă');
+    const created = o.created_at ? new Date(o.created_at).toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    return `
+    <div class="order-card">
+      <div class="order-header" onclick="toggleOrder('${o.id}')">
+        <div>
+          <div class="order-id-label">Număr Comandă</div>
+          <div class="order-num">#${o.id}</div>
+          <div class="order-date">${created}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem;">
+          <span class="status-badge status-${o.status||'nouă'}">${STATUS_LABELS[o.status||'nouă']}</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;">${o.total||0} lei</span>
+        </div>
+      </div>
+      <div class="order-body" id="ob-${o.id}">
+        <div class="progress-bar">
+          ${STATUSES.map((s,i)=>`<div class="pb-step ${i<statusIdx?'done':i===statusIdx?'current':''}">${STATUS_LABELS[s]}</div>`).join('')}
+        </div>
+        <div class="od-grid">
+          <div class="od-field"><h5>Client</h5><p>${o.name||'—'}</p></div>
+          <div class="od-field"><h5>Telefon</h5><p><a href="tel:${o.phone}" style="color:var(--rose);">${o.phone||'—'}</a></p></div>
+          <div class="od-field"><h5>Adresă Livrare</h5><p>${o.address||'—'}</p></div>
+          <div class="od-field"><h5>Data & Ora Livrării</h5><p>${o.delivery_date||'—'} ${o.delivery_time?'· '+o.delivery_time:''}</p></div>
+          <div class="od-field"><h5>Metodă Plată</h5><p>${o.payment_method==='card'?'💳 Card':o.payment_method==='apple'?'🍎 Apple Pay':o.payment_method==='google'?'🔵 Google Pay':'💵 Cash'}</p></div>
+          ${o.message?`<div class="od-field"><h5>Mesaj Card</h5><p>"${o.message}"</p></div>`:''}
+        </div>
+        <div class="order-items-list">
+          ${items.map(i=>`
+          <div class="oi-row">
+            <img class="oi-img" src="${i.img}" alt="${i.name}">
+            <div class="oi-name">${i.name}</div>
+            <div class="oi-qty">× ${i.qty}</div>
+            <div class="oi-price">${i.price*i.qty} lei</div>
+          </div>`).join('')}
+        </div>
+        ${isAdmin?`
+        <div style="margin-top:1.5rem;border-top:1px solid var(--cream2);padding-top:1.2rem;">
+          <label style="font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.5rem;">Actualizează Status</label>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+            ${STATUSES.map(s=>`<button onclick="updateStatus('${o.id}','${s}')" class="btn-${s===o.status?'rose':'outline'}" style="padding:.5rem 1rem;font-size:.65rem;">${STATUS_LABELS[s]}</button>`).join('')}
+          </div>
+        </div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleOrder(id){
+  document.getElementById('ob-'+id).classList.toggle('open');
+}
+
+async function updateStatus(id, status){
+  await initSupabase();
+  if(supabase){
+    await supabase.from('orders').update({status}).eq('id',id);
+    showToast('Status actualizat: '+STATUS_LABELS[status],'success');
+    await loadOrders();
+  } else {
+    const o = allOrders.find(x=>x.id===id);
+    if(o){o.status=status;renderOrders(getFiltered());showToast('Status actualizat (demo)','success');}
+  }
+}
+
+loadOrders();
+
+// Refresh every 30s for real-time feel
+setInterval(loadOrders, 30000);
+</script>
+</body>
+</html>
